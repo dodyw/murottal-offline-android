@@ -1,8 +1,11 @@
 package com.nicecoder.murottal
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.widget.ListView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +19,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fabReverse: FloatingActionButton
     private var isReversed = false
     private lateinit var adapter: AudioAdapter
+    private var audioService: AudioService? = null
+    private var serviceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as AudioService.LocalBinder
+            audioService = binder.getService()
+            serviceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            audioService = null
+            serviceBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +64,11 @@ class MainActivity : AppCompatActivity() {
         fabReverse.setOnClickListener {
             reverseAudioList()
         }
+
+        // Start and bind to the AudioService
+        val intent = Intent(this, AudioService::class.java)
+        startService(intent)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     private fun updateList() {
@@ -65,5 +88,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateList()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (serviceBound) {
+            unbindService(serviceConnection)
+            serviceBound = false
+        }
     }
 }
