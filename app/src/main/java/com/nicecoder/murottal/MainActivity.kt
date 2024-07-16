@@ -1,5 +1,6 @@
 package com.nicecoder.murottal
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ListView
@@ -29,8 +30,11 @@ class MainActivity : AppCompatActivity() {
         listView = findViewById(R.id.listView)
         fabReverse = findViewById(R.id.fabReverse)
 
-        adapter = AudioAdapter(this, AudioList.list)
-        listView.adapter = adapter
+        // Load the saved isReversed status
+        val sharedPref = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        isReversed = sharedPref.getBoolean("isReversed", false)
+
+        updateList()
 
         listView.setOnItemClickListener { _, _, position, _ ->
             val intent = Intent(this, PlayerActivity::class.java)
@@ -44,15 +48,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateList() {
+        val currentList = if (isReversed) AudioList.list.reversed() else AudioList.list
+        adapter = AudioAdapter(this, currentList)
+        listView.adapter = adapter
+    }
+
     private fun reverseAudioList() {
         isReversed = !isReversed
-        val reversedList = if (isReversed) {
-            AudioList.list.reversed()
-        } else {
-            AudioList.list
+
+        // Save the new isReversed status
+        val sharedPref = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putBoolean("isReversed", isReversed)
+            apply()
         }
 
-        adapter = AudioAdapter(this, reversedList)
-        listView.adapter = adapter
+        updateList()
     }
 }

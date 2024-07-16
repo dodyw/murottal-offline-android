@@ -1,5 +1,6 @@
 package com.nicecoder.murottal
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -46,7 +47,10 @@ class PlayerActivity : AppCompatActivity() {
         loopButton = findViewById(R.id.loopButton)
 
         currentPosition = intent.getIntExtra("position", 0)
-        isReversed = intent.getBooleanExtra("isReversed", false)
+
+        // Load the saved isReversed status
+        val sharedPref = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        isReversed = sharedPref.getBoolean("isReversed", false)
 
         currentList = if (isReversed) AudioList.list.reversed() else AudioList.list
 
