@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
@@ -20,7 +21,9 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playPauseButton: Button
     private lateinit var previousButton: Button
     private lateinit var nextButton: Button
+    private lateinit var loopButton: Button
     private var currentPosition: Int = 0
+    private var isLooping: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +40,7 @@ class PlayerActivity : AppCompatActivity() {
         playPauseButton = findViewById(R.id.playPauseButton)
         previousButton = findViewById(R.id.previousButton)
         nextButton = findViewById(R.id.nextButton)
+        loopButton = findViewById(R.id.loopButton)
 
         currentPosition = intent.getIntExtra("position", 0)
 
@@ -77,6 +81,12 @@ class PlayerActivity : AppCompatActivity() {
                 playNewTrack()
             }
         }
+
+        loopButton.setOnClickListener {
+            isLooping = !isLooping
+            player.repeatMode = if (isLooping) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
+            updateLoopButtonAppearance()
+        }
     }
 
     private fun playNewTrack() {
@@ -85,6 +95,12 @@ class PlayerActivity : AppCompatActivity() {
         player.prepare()
         player.play()
         updateTitle()
+    }
+
+    private fun updateLoopButtonAppearance() {
+        loopButton.text = if (isLooping) "Unloop" else "Loop"
+        // You can also change the button's appearance more dramatically here
+        // For example, changing its background color or icon
     }
 
     override fun onDestroy() {
