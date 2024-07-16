@@ -1,7 +1,7 @@
 package com.nicecoder.murottal
 
 object AudioList {
-    val list = listOf(
+    val list = mutableListOf(
         Audio("Al Fatihah", R.raw.al_fatihah),
         Audio("Al-Mujadilah", R.raw.al_mujadilah),
         Audio("Al-Hasyr", R.raw.al_hasyr),

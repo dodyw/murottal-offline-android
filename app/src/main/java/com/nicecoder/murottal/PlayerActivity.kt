@@ -15,6 +15,8 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource
 
 class PlayerActivity : AppCompatActivity() {
 
+    private lateinit var currentList: List<Audio>
+
     private lateinit var player: SimpleExoPlayer
     private lateinit var playerView: PlayerView
     private lateinit var titleTextView: TextView
@@ -24,6 +26,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var loopButton: Button
     private var currentPosition: Int = 0
     private var isLooping: Boolean = false
+    private var isReversed: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,9 @@ class PlayerActivity : AppCompatActivity() {
         loopButton = findViewById(R.id.loopButton)
 
         currentPosition = intent.getIntExtra("position", 0)
+        isReversed = intent.getBooleanExtra("isReversed", false)
+
+        currentList = if (isReversed) AudioList.list.reversed() else AudioList.list
 
         initializePlayer()
         updateTitle()
@@ -53,14 +59,14 @@ class PlayerActivity : AppCompatActivity() {
         player = SimpleExoPlayer.Builder(this).build()
         playerView.player = player
 
-        val mediaItem = MediaItem.fromUri(RawResourceDataSource.buildRawResourceUri(AudioList.list[currentPosition].resourceId))
+        val mediaItem = MediaItem.fromUri(RawResourceDataSource.buildRawResourceUri(currentList[currentPosition].resourceId))
         player.setMediaItem(mediaItem)
         player.prepare()
         player.play()
     }
 
     private fun updateTitle() {
-        titleTextView.text = AudioList.list[currentPosition].title
+        titleTextView.text = currentList[currentPosition].title
     }
 
     private fun setupButtons() {
@@ -82,7 +88,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         nextButton.setOnClickListener {
-            if (currentPosition < AudioList.list.size - 1) {
+            if (currentPosition < currentList.size - 1) {
                 currentPosition++
                 playNewTrack()
             }
@@ -101,7 +107,7 @@ class PlayerActivity : AppCompatActivity() {
 
             override fun onPlaybackStateChanged(state: Int) {
                 if (state == Player.STATE_ENDED) {
-                    if (currentPosition < AudioList.list.size - 1) {
+                    if (currentPosition < currentList.size - 1) {
                         currentPosition++
                         playNewTrack()
                     } else {
@@ -113,7 +119,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun playNewTrack() {
-        val mediaItem = MediaItem.fromUri(RawResourceDataSource.buildRawResourceUri(AudioList.list[currentPosition].resourceId))
+        val mediaItem = MediaItem.fromUri(RawResourceDataSource.buildRawResourceUri(currentList[currentPosition].resourceId))
         player.setMediaItem(mediaItem)
         player.prepare()
         player.play()
