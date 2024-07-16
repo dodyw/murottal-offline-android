@@ -67,6 +67,8 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
+        supportActionBar?.title = "Player"
+
         playerView = findViewById(R.id.playerView)
         titleTextView = findViewById(R.id.titleTextView)
         playPauseButton = findViewById(R.id.playPauseButton)
