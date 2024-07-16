@@ -65,7 +65,13 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun setupButtons() {
         playPauseButton.setOnClickListener {
-            if (player.isPlaying) player.pause() else player.play()
+            if (player.isPlaying) {
+                player.pause()
+            } else {
+                player.play()
+            }
+
+            updatePlayPauseButton()
         }
 
         previousButton.setOnClickListener {
@@ -87,6 +93,23 @@ class PlayerActivity : AppCompatActivity() {
             player.repeatMode = if (isLooping) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
             updateLoopButtonAppearance()
         }
+
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                updatePlayPauseButton()
+            }
+
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_ENDED) {
+                    if (currentPosition < AudioList.list.size - 1) {
+                        currentPosition++
+                        playNewTrack()
+                    } else {
+                        updatePlayPauseButton()
+                    }
+                }
+            }
+        })
     }
 
     private fun playNewTrack() {
@@ -99,8 +122,10 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun updateLoopButtonAppearance() {
         loopButton.text = if (isLooping) "Unloop" else "Loop"
-        // You can also change the button's appearance more dramatically here
-        // For example, changing its background color or icon
+    }
+
+    private fun updatePlayPauseButton() {
+        playPauseButton.text = if (player.isPlaying) "Pause" else "Play"
     }
 
     override fun onDestroy() {
