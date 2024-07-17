@@ -40,4 +40,4 @@ For more information or to discuss potential projects, please visit my [Upwork p
 <img src="ss/2.png" width="300" alt="Player Screen">
 
 ### Audio controls in notification
-<img src="ss/2.png" width="300" alt="Audio controls in notification">
+<img src="ss/3.png" width="300" alt="Audio controls in notification">
